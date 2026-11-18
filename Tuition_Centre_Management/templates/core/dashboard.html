@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% load humanize %}
+
+{% block title %}Dashboard | Green Valley Tuition Centre{% endblock %}
+
+{% block content %}
+<div class="row align-items-center mb-4">
+    <div class="col-md-8">
+        <h2 class="fw-bold mb-1">Front Office Dashboard</h2>
+        <p class="text-muted mb-0">Overview of student enrollments, batch occupancy, and pending fees.</p>
+    </div>
+    <div class="col-md-4 text-md-end mt-3 mt-md-0">
+        <a href="{% url 'student_add' %}" class="btn btn-success me-2">
+            <i class="bi bi-person-plus-fill me-1"></i> Enroll Student
+        </a>
+        <a href="{% url 'student_list' %}" class="btn btn-outline-primary">
+            <i class="bi bi-list-ul me-1"></i> View Directory
+        </a>
+    </div>
+</div>
+
+<!-- Key Performance Indicators: Total Students & Total Pending Fees -->
+<div class="row g-3 mb-4">
+    <!-- Card 1: Total Students -->
+    <div class="col-12 col-md-6">
+        <div class="card stat-card h-100 p-3">
+            <div class="d-flex align-items-center justify-content-between">
+                <div>
+                    <span class="text-uppercase text-muted fw-semibold small">Total Students</span>
+                    <h3 class="fw-bold mt-1 mb-0 text-dark">{{ total_students }}</h3>
+                </div>
+                <div class="bg-primary bg-opacity-10 text-primary p-3 rounded-circle">
+                    <i class="bi bi-mortarboard fs-3"></i>
+                </div>
+            </div>
+            <div class="mt-2 small text-muted">
+                <span>Active enrollments across all batches</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Card 2: Total Pending Fees -->
+    <div class="col-12 col-md-6">
+        <div class="card stat-card-warning h-100 p-3">
+            <div class="d-flex align-items-center justify-content-between">
+                <div>
+                    <span class="text-uppercase text-muted fw-semibold small">Total Pending Fees</span>
+                    <h3 class="fw-bold mt-1 mb-0 text-danger">₹{{ total_pending_fees|intcomma }}</h3>
+                </div>
+                <div class="bg-danger bg-opacity-10 text-danger p-3 rounded-circle">
+                    <i class="bi bi-exclamation-diamond fs-3"></i>
+                </div>
+            </div>
+            <div class="mt-2 small text-muted">
+                <span>Outstanding dues to be collected</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Section: Students Per Batch -->
+<div class="card shadow-sm">
+    <div class="card-header py-3">
+        <h5 class="mb-0 fw-bold">
+            <i class="bi bi-collection-fill text-primary me-2"></i>Students Per Batch
+        </h5>
+    </div>
+    <div class="card-body">
+        {% if batch_stats %}
+            <div class="list-group list-group-flush">
+                {% for item in batch_stats %}
+                    <div class="list-group-item d-flex justify-content-between align-items-center py-3 px-2">
+                        <div>
+                            <h6 class="fw-bold mb-1 text-dark">{{ item.batch.name }}</h6>
+                            <a href="{% url 'student_list' %}?batch={{ item.batch.id }}" class="small text-decoration-none text-primary">
+                                View batch students <i class="bi bi-arrow-right"></i>
+                            </a>
+                        </div>
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="fw-semibold text-secondary fs-6">
+                                {{ item.count }} / {{ item.max }}
+                            </span>
+                            {% if item.is_full %}
+                                <span class="badge bg-danger px-2 py-1">
+                                    Full
+                                </span>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p class="text-muted mb-0">No batches have been created yet.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

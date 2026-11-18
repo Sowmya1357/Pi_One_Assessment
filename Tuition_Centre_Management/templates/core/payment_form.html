@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+{% load humanize %}
+
+{% block title %}Record Payment - {{ student.name }} | Green Valley Tuition Centre{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <!-- Student Balance Overview Card -->
+        <div class="card shadow-sm border-0 mb-4">
+            <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
+                <h5 class="fw-bold mb-0 text-dark">
+                    <i class="bi bi-wallet2 text-success me-2"></i>Record Fee Payment: {{ student.name }}
+                </h5>
+                <a href="{% url 'student_list' %}" class="btn btn-sm btn-outline-secondary">
+                    <i class="bi bi-arrow-left me-1"></i> Back to Directory
+                </a>
+            </div>
+            <div class="card-body p-4">
+                <div class="row g-3 text-center mb-4">
+                    <div class="col-sm-4">
+                        <div class="p-3 bg-light rounded-3">
+                            <span class="text-muted small text-uppercase fw-semibold d-block">Total Course Fee</span>
+                            <span class="fs-5 fw-bold text-dark">₹{{ student.total_fee|intcomma }}</span>
+                        </div>
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="p-3 bg-success bg-opacity-10 rounded-3">
+                            <span class="text-success small text-uppercase fw-semibold d-block">Total Paid</span>
+                            <span class="fs-5 fw-bold text-success">₹{{ student.total_paid|intcomma }}</span>
+                        </div>
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="p-3 bg-danger bg-opacity-10 rounded-3">
+                            <span class="text-danger small text-uppercase fw-semibold d-block">Outstanding Balance</span>
+                            <span class="fs-5 fw-bold text-danger">₹{{ student.balance|intcomma }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Payment Form -->
+                <form method="post" novalidate>
+                    {% csrf_token %}
+
+                    <!-- Payment Amount Field -->
+                    <div class="mb-3">
+                        <label for="{{ form.amount.id_for_label }}" class="form-label fw-semibold">
+                            Payment Amount (₹) <span class="text-danger">*</span>
+                        </label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light fw-bold">₹</span>
+                            {{ form.amount }}
+                        </div>
+                        <div class="form-text small text-muted mt-1">
+                            <i class="bi bi-shield-check text-success me-1"></i>Payment cannot exceed the remaining balance of <strong>₹{{ student.balance|intcomma }}</strong>.
+                        </div>
+                        {% if form.amount.errors %}
+                            <div class="alert alert-danger small mt-2 py-2 px-3 fw-medium">
+                                <i class="bi bi-x-octagon-fill me-1"></i>{{ form.amount.errors.0 }}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Payment Date -->
+                    <div class="mb-3">
+                        <label for="{{ form.payment_date.id_for_label }}" class="form-label fw-semibold">
+                            Payment Date <span class="text-danger">*</span>
+                        </label>
+                        {{ form.payment_date }}
+                        {% if form.payment_date.errors %}
+                            <div class="text-danger small mt-1">{{ form.payment_date.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Notes / Receipt Reference -->
+                    <div class="mb-4">
+                        <label for="{{ form.notes.id_for_label }}" class="form-label fw-semibold">
+                            Receipt / Mode of Payment
+                        </label>
+                        {{ form.notes }}
+                        <div class="form-text small text-muted">E.g., "GPay Ref #98124", "Cash Receipt #45", "Bank Transfer"</div>
+                    </div>
+
+                    <!-- Submit Actions -->
+                    <div class="d-flex justify-content-end gap-2 pt-3 border-top">
+                        <a href="{% url 'student_list' %}" class="btn btn-outline-secondary">Cancel</a>
+                        <button type="submit" class="btn btn-success px-4">
+                            <i class="bi bi-check2-circle me-1"></i> Confirm & Record Payment
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Payment History Table -->
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white py-3 border-bottom">
+                <h6 class="fw-bold mb-0 text-dark">
+                    <i class="bi bi-clock-history text-primary me-2"></i>Payment History for {{ student.name }}
+                </h6>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th class="ps-3">Date</th>
+                                <th>Amount</th>
+                                <th>Receipt / Mode</th>
+                                <th class="text-end pe-3">Recorded On</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for payment in payment_history %}
+                                <tr>
+                                    <td class="ps-3 fw-medium">{{ payment.payment_date|date:"d M Y" }}</td>
+                                    <td class="text-success fw-bold">₹{{ payment.amount|intcomma }}</td>
+                                    <td class="text-muted">{{ payment.notes|default:"-" }}</td>
+                                    <td class="text-end pe-3 small text-muted">{{ payment.created_at|date:"d M Y, H:i" }}</td>
+                                </tr>
+                            {% empty %}
+                                <tr>
+                                    <td colspan="4" class="text-center py-4 text-muted">No prior payments recorded for this student.</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

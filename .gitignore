@@ -1,0 +1,41 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+venv/
+.venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# Node modules
+node_modules/
+
+# Database files
+*.sqlite3
+*.sqlite3-journal
+
+# Environment variables & secrets (do not commit secrets)
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+
+# Django static collection & media
+staticfiles/
+media/
+
+# IDE & Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS generated files
+.DS_Store
+Thumbs.db
+Desktop.ini

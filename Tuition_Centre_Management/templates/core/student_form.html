@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+
+{% block title %}{{ action_title }} | Green Valley Tuition Centre{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8 col-xl-7">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white py-3 border-bottom">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="fw-bold mb-0 text-dark">
+                        <i class="bi bi-person-badge-fill text-primary me-2"></i>{{ action_title }}
+                    </h5>
+                    <a href="{% url 'student_list' %}" class="btn btn-sm btn-outline-secondary">
+                        <i class="bi bi-arrow-left me-1"></i> Back to Directory
+                    </a>
+                </div>
+            </div>
+            <div class="card-body p-4">
+
+                <!-- Form-level / Non-field errors (e.g. batch cap validation) -->
+                {% if form.non_field_errors %}
+                    <div class="alert alert-danger d-flex align-items-center gap-2 mb-4" role="alert">
+                        <i class="bi bi-exclamation-triangle-fill fs-5"></i>
+                        <div>
+                            {% for error in form.non_field_errors %}
+                                <div>{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endif %}
+
+                <form method="post" novalidate>
+                    {% csrf_token %}
+
+                    <!-- Student Name -->
+                    <div class="mb-3">
+                        <label for="{{ form.name.id_for_label }}" class="form-label fw-semibold">
+                            Full Name <span class="text-danger">*</span>
+                        </label>
+                        {{ form.name }}
+                        {% if form.name.errors %}
+                            <div class="text-danger small mt-1">
+                                {{ form.name.errors.0 }}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Email Address -->
+                    <div class="mb-3">
+                        <label for="{{ form.email.id_for_label }}" class="form-label fw-semibold">
+                            Email Address <span class="text-danger">*</span>
+                        </label>
+                        {{ form.email }}
+                        <div class="form-text small text-muted">
+                            <i class="bi bi-info-circle me-1"></i>Email must be unique across all students.
+                        </div>
+                        {% if form.email.errors %}
+                            <div class="text-danger small mt-1 fw-medium">
+                                <i class="bi bi-x-circle-fill me-1"></i>{{ form.email.errors.0 }}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Phone Number -->
+                    <div class="mb-3">
+                        <label for="{{ form.phone.id_for_label }}" class="form-label fw-semibold">
+                            Phone Number <span class="text-danger">*</span>
+                        </label>
+                        {{ form.phone }}
+                        {% if form.phone.errors %}
+                            <div class="text-danger small mt-1">
+                                {{ form.phone.errors.0 }}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Batch Selection -->
+                    <div class="mb-3">
+                        <label for="{{ form.batch.id_for_label }}" class="form-label fw-semibold">
+                            Assign Weekend Batch <span class="text-danger">*</span>
+                        </label>
+                        {{ form.batch }}
+                        <div class="form-text small text-muted">
+                            <i class="bi bi-people-fill me-1"></i>Each batch holds a maximum of {{ max_capacity }} students. Full batches will reject enrollment.
+                        </div>
+                        {% if form.batch.errors %}
+                            <div class="alert alert-danger small mt-2 py-2 px-3 fw-medium">
+                                <i class="bi bi-shield-x me-1"></i>{{ form.batch.errors.0 }}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Total Fee -->
+                    <div class="mb-4">
+                        <label for="{{ form.total_fee.id_for_label }}" class="form-label fw-semibold">
+                            Total Tuition Fee (₹) <span class="text-danger">*</span>
+                        </label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light fw-bold">₹</span>
+                            {{ form.total_fee }}
+                        </div>
+                        <div class="form-text small text-muted">Total agreed fee amount for the weekend tuition course.</div>
+                        {% if form.total_fee.errors %}
+                            <div class="text-danger small mt-1">
+                                {{ form.total_fee.errors.0 }}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="d-flex justify-content-end gap-2 pt-3 border-top">
+                        <a href="{% url 'student_list' %}" class="btn btn-outline-secondary">
+                            Cancel
+                        </a>
+                        <button type="submit" class="btn btn-success px-4">
+                            <i class="bi bi-check-lg me-1"></i> Save Student Record
+                        </button>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
